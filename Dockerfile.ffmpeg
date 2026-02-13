@@ -1,14 +1,19 @@
 FROM vmaf
 
 RUN apt-get update && \
-    apt-get install -y pkg-config libdav1d-dev libx264-dev git
+    apt-get install -y pkg-config libx264-dev git python3-pip && \
+    pip3 install meson
 
-
-RUN set -eux; \
-    for d in /usr/local/lib /usr/local/lib/x86_64-linux-gnu /usr/local/lib64; do \
-        if [ -d "$d" ]; then echo "$d"; fi; \
-    done > /etc/ld.so.conf.d/00-vmaf-local.conf && \
+# build dav1d from source (requires >= 1.0.0 for ffmpeg)
+RUN git clone --depth 1 --branch 1.4.2 https://code.videolan.org/videolan/dav1d.git && \
+    cd dav1d && \
+    mkdir build && cd build && \
+    meson setup .. --default-library=static --buildtype release && \
+    ninja && \
+    ninja install && \
     ldconfig
+
+ENV PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/local/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH"
 
 ARG FFMPEG_TAG=master
 ARG NVCC_FLAGS="-gencode arch=compute_75,code=sm_75 -gencode arch=compute_75,code=compute_75 -O2"
