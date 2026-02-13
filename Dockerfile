@@ -22,7 +22,10 @@ RUN apt-get update && \
 COPY . /vmaf
 
 # setup environment
+
 ENV PATH=/vmaf:/vmaf/libvmaf/build/tools:$PATH
+ENV PKG_CONFIG_PATH="/usr/local/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH"
+
 
 RUN wget https://github.com/FFmpeg/nv-codec-headers/archive/${NV_CODEC_TAG}.zip && unzip ${NV_CODEC_TAG}.zip && cd nv-codec-headers-${NV_CODEC_TAG} && make && make install
 
