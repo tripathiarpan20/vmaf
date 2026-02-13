@@ -28,7 +28,12 @@ RUN wget https://github.com/FFmpeg/nv-codec-headers/archive/${NV_CODEC_TAG}.zip 
 
 # make vmaf
 # when disabling NVCC, libvmaf will be built without cubin's which will compile kernels at start of the container
-RUN cd /vmaf && make clean && make ENABLE_NVCC=true && make install
+RUN cd /vmaf && make clean && make ENABLE_NVCC=true && make install && \
+    set -eux; \
+    for d in /usr/local/lib /usr/local/lib/x86_64-linux-gnu /usr/local/lib64; do \
+        if [ -d "$d" ]; then echo "$d"; fi; \
+    done > /etc/ld.so.conf.d/00-vmaf-local.conf && \
+    ldconfig
 
 # install python tools
 RUN pip3 install --no-cache-dir -r /vmaf/python/requirements.txt
