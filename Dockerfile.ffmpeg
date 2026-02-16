@@ -19,9 +19,9 @@ ARG FFMPEG_TAG=master
 ARG NVCC_FLAGS="-gencode arch=compute_75,code=sm_75 -gencode arch=compute_75,code=compute_75 -O2"
 
 # get ffmpeg
-RUN git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg
+RUN git clone https://github.com/FFmpeg/FFmpeg ffmpeg
 
-RUN cd ffmpeg && ./configure \
+RUN cd ffmpeg && git reset --hard 33b215d1554a14e87416a24f8e6034312e629af7 && ./configure \
     --enable-gpl \
     --enable-libx264 \
     --enable-libvmaf \
